@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, Linking } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import {
   Camera,
   useCameraDevice,
@@ -7,18 +7,12 @@ import {
   useCodeScanner,
 } from 'react-native-vision-camera';
 
-function App() {
+import UPIHandler from '../Utils/UPIHandler';
+
+function UPIScan() {
   const device = useCameraDevice('back');
   const { hasPermission, requestPermission } = useCameraPermission();
   const [scanned, setScanned] = useState(false);
-
-  const upiDeepLink = async (upi_url: string) => {
-    if (!upi_url.startsWith('upi://')) return;
-    const supported = await Linking.canOpenURL(upi_url);
-    if (supported) {
-      Linking.openURL(upi_url);
-    }
-  };
 
   useEffect(() => {
     if (!hasPermission) {
@@ -34,7 +28,7 @@ function App() {
 
         const value = codes[0]?.value ?? 'Unknown';
 
-        upiDeepLink(value);
+        UPIHandler(value);
         setTimeout(() => setScanned(false), 2000);
       }
     },
@@ -53,4 +47,4 @@ function App() {
   );
 }
 
-export default App;
+export default UPIScan;
