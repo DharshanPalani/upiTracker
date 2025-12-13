@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import Home from './Pages/Home';
 import UPIScan from './Pages/UPIScan';
+import AmountPage from './Pages/AmountPage';
 
 const Stack = createNativeStackNavigator();
 
@@ -15,6 +16,7 @@ function App() {
       >
         <Stack.Screen name="Home" component={Home} />
         <Stack.Screen name="UPIScan" component={UPIScan} />
+        <Stack.Screen name="AmountPage" component={AmountPage} />
       </Stack.Navigator>
     </NavigationContainer>
   );

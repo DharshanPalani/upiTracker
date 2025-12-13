@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet, Text, Alert, Linking } from 'react-native';
 import {
   Camera,
   useCameraDevice,
   useCameraPermission,
   useCodeScanner,
 } from 'react-native-vision-camera';
-
-import UPIHandler from '../Utils/UPIHandler';
+import { useNavigation } from '@react-navigation/native';
 
 function UPIScan() {
+  const navigation = useNavigation<any>();
+
   const device = useCameraDevice('back');
   const { hasPermission, requestPermission } = useCameraPermission();
   const [scanned, setScanned] = useState(false);
@@ -20,22 +21,43 @@ function UPIScan() {
     }
   }, [hasPermission]);
 
+  const handleUPI = async (upi_url: string) => {
+    if (!upi_url.startsWith('upi://')) return;
+
+    if (!upi_url.includes('am=')) {
+      navigation.navigate('AmountPage', { upi_url });
+      return;
+    }
+
+    try {
+      const supported = await Linking.canOpenURL(upi_url);
+      if (!supported) {
+        Alert.alert('No UPI app found');
+        return;
+      }
+
+      await Linking.openURL(upi_url);
+    } catch (err) {
+      Alert.alert('Failed to open UPI app');
+    }
+  };
+
   const upiScanner = useCodeScanner({
     codeTypes: ['qr'],
     onCodeScanned: async codes => {
       if (!scanned && codes.length > 0) {
         setScanned(true);
-
         const value = codes[0]?.value ?? 'Unknown';
 
-        UPIHandler(value);
+        await handleUPI(value);
+
         setTimeout(() => setScanned(false), 2000);
       }
     },
   });
 
-  if (device == null) return <Text>No device</Text>;
-  if (!hasPermission) return <Text>Waiting for camera permission</Text>;
+  if (device == null) return <Text>No camera device found</Text>;
+  if (!hasPermission) return <Text>Waiting for camera permission...</Text>;
 
   return (
     <Camera
