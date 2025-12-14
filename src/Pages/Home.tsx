@@ -1,59 +1,76 @@
 import React from 'react';
-import { Text, StyleSheet, View, TouchableOpacity } from 'react-native';
+import {
+  Text,
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  FlatList,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+
+import { HomeStyle } from '../styles/HomeStyle';
 
 const Home = () => {
   const navigation = useNavigation<any>();
 
+  const styles = HomeStyle;
+
+  const recentTx = [
+    { id: '1', amount: '₹120', type: 'UPI Payment' },
+    { id: '2', amount: '₹45', type: 'Mobile Pay' },
+    { id: '3', amount: '₹560', type: 'UPI Payment' },
+    { id: '4', amount: '₹560', type: 'UPI Payment' },
+    { id: '5', amount: '₹560', type: 'UPI Payment' },
+  ];
+
   return (
     <View style={styles.container}>
-      <View style={styles.content}>
-        <Text style={styles.hint}>UPI tracker</Text>
+      <View style={styles.header}>
+        <Text style={styles.title}>UPI Tracker</Text>
+        <TouchableOpacity onPress={() => navigation.navigate('Settings')}>
+          <Text style={styles.settings}>⚙️</Text>
+        </TouchableOpacity>
       </View>
 
-      <TouchableOpacity
-        activeOpacity={0.85}
-        style={styles.scanButton}
-        onPress={() => navigation.navigate('UPIScan')}
-      >
-        <Text style={styles.scanText}>Scan</Text>
-      </TouchableOpacity>
+      <View style={styles.actionsRow}>
+        <TouchableOpacity
+          style={styles.sideButton}
+          onPress={() => navigation.navigate('MobilePay')}
+        >
+          <Text style={styles.sideText}>Mobile</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.scanButton}
+          onPress={() => navigation.navigate('UPIScan')}
+        >
+          <Text style={styles.scanText}>Scan</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.sideButton}
+          onPress={() => navigation.navigate('TransactionHistory')}
+        >
+          <Text style={styles.sideText}>History</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.recent}>
+        <Text style={styles.recentTitle}>Recent Transactions</Text>
+
+        <FlatList
+          data={recentTx}
+          keyExtractor={item => item.id}
+          renderItem={({ item }) => (
+            <View style={styles.txItem}>
+              <Text style={styles.txAmount}>{item.amount}</Text>
+              <Text style={styles.txSub}>{item.type}</Text>
+            </View>
+          )}
+        />
+      </View>
     </View>
   );
 };
 
 export default Home;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#3f3c3cff',
-    justifyContent: 'space-between',
-    paddingVertical: 40,
-  },
-
-  content: {
-    alignItems: 'center',
-    marginTop: 140,
-  },
-
-  hint: {
-    fontSize: 16,
-    color: '#bdbdbd',
-  },
-
-  scanButton: {
-    marginHorizontal: 20,
-    marginBottom: 20,
-    backgroundColor: '#7b4dff',
-    paddingVertical: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-
-  scanText: {
-    color: '#ffffff',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-});
