@@ -13,6 +13,7 @@ function UPIScan() {
 
   const device = useCameraDevice('back');
   const { hasPermission, requestPermission } = useCameraPermission();
+  const [scannerActive, setScannerActive] = useState(true);
   const [scanned, setScanned] = useState(false);
 
   useEffect(() => {
@@ -25,7 +26,7 @@ function UPIScan() {
     if (!upi_url.startsWith('upi://')) return;
 
     if (!upi_url.includes('am=')) {
-      navigation.navigate('AmountPage', { upi_url });
+      navigation.replace('AmountPage', { upi_url });
       return;
     }
 
@@ -47,11 +48,15 @@ function UPIScan() {
     onCodeScanned: async codes => {
       if (!scanned && codes.length > 0) {
         setScanned(true);
+        setScannerActive(false);
         const value = codes[0]?.value ?? 'Unknown';
 
         await handleUPI(value);
 
-        setTimeout(() => setScanned(false), 2000);
+        setTimeout(() => {
+          setScanned(false);
+          setScannerActive(true);
+        }, 2000);
       }
     },
   });
@@ -63,7 +68,7 @@ function UPIScan() {
     <Camera
       style={StyleSheet.absoluteFill}
       device={device}
-      isActive
+      isActive={scannerActive}
       codeScanner={upiScanner}
     />
   );
